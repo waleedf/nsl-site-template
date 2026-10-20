@@ -1,0 +1,82 @@
+---
+// Service landing page: buying information first (header, answer, action),
+// then what it is, why you'd want it, how it works and costs, why this
+// business, answer-shaped FAQ, and links to every town it's offered in.
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Hero from '../../components/Hero.astro';
+import Copy from '../../components/Copy.astro';
+import Faq from '../../components/Faq.astro';
+import LinkSection from '../../components/LinkSection.astro';
+import InquiryForm from '../../components/InquiryForm.astro';
+import SecondaryCapture from '../../components/SecondaryCapture.astro';
+import { combosOf, getBusiness, makeHref, paths, relatedServices } from '../../lib/site.mjs';
+import { comboHeader, faqFor, serviceDescription, serviceHeader, serviceSummary, title } from '../../lib/copy.mjs';
+import { faqLd, serviceLd } from '../../lib/ld.mjs';
+
+export function getStaticPaths() {
+  return getBusiness().services.map((s) => ({ params: { service: s.id }, props: { id: s.id } }));
+}
+
+const b = getBusiness();
+const s = b.services.find((x) => x.id === Astro.props.id)!;
+const href = makeHref(import.meta.env.BASE_URL);
+const header = serviceHeader(b, s);
+const combos = combosOf(b).filter((c) => c.service.id === s.id);
+const faq = faqFor(b, s);
+const guides = (await getCollection('guides')).filter((g) => g.data.about.includes(s.id));
+const url = new URL(href(paths.service(s)), Astro.site).href;
+---
+<Base
+  title={title(header, b)}
+  description={serviceDescription(b, s)}
+  pageType="service"
+  crumbs={[{ name: 'Home', href: href() }, { name: 'Services', href: href(paths.services()) }, { name: s.name, href: href(paths.service(s)) }]}
+  jsonLd={[serviceLd(b, s, combos.map((c) => `${c.location.name}, ${c.location.region}`), url), faqLd(faq)]}
+>
+  <Hero header={header} summary={serviceSummary(b, s)} cta={`Get a ${s.keyword} quote`} />
+
+  <section class="section" data-section="what">
+    <div class="wrap two-col">
+      <div><h2>What is {s.keyword}?</h2><Copy text={s.what} /></div>
+      <div data-section="why"><h2>Why get {s.keyword}?</h2><Copy text={s.why} /></div>
+    </div>
+  </section>
+
+  <section class="section" data-section="how">
+    <div class="wrap two-col">
+      <div><h2>How {s.keyword} works</h2><Copy text={s.how} /></div>
+      <div><h2>What {s.keyword} costs</h2><Copy text={s.pricing} /></div>
+    </div>
+  </section>
+
+  <section class="section" data-section="why-us">
+    <div class="wrap">
+      <h2>Why {b.name} for {s.keyword}?</h2>
+      {b.proof.length ? <ul class="proof">{b.proof.map((p) => <li>{p}</li>)}</ul> : <Copy text={null} />}
+    </div>
+  </section>
+
+  <LinkSection
+    heading={`${s.name} near you`}
+    section="areas"
+    links={combos.map((c) => ({ href: href(paths.combo(s, c.location)), label: comboHeader(b, s, c.location, c.override) }))}
+  />
+
+  <Faq heading={`${s.name} questions`} items={faq} />
+
+  <LinkSection
+    heading="Related services"
+    section="related"
+    links={relatedServices(b, s).map((r) => ({ href: href(paths.service(r)), label: serviceHeader(b, r) }))}
+  />
+
+  <LinkSection
+    heading={`${s.name} guides`}
+    section="guides"
+    links={guides.map((g) => ({ href: href(paths.guide(g.id)), label: g.data.title }))}
+  />
+
+  <InquiryForm service={s.id} heading={`Get a ${s.keyword} quote`} />
+  <SecondaryCapture />
+</Base>

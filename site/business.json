@@ -1,0 +1,108 @@
+{
+  "example": true,
+  "slug": "fernbrook",
+  "name": "Fernbrook Window Cleaning",
+  "trade": "Window & Gutter Cleaning",
+  "market": "Orange County",
+  "summary": null,
+  "phone": "(714) 555-0142",
+  "email": null,
+  "domain": null,
+  "brand": {
+    "ink": "#15232b",
+    "paper": "#f6f4ee",
+    "accent": "#1d6b73",
+    "accentInk": "#ffffff"
+  },
+  "proof": [],
+  "reviews": null,
+  "secondary": {
+    "kind": "giveaway",
+    "prize": "$100 off your next window cleaning",
+    "endsOn": "2026-12-31",
+    "rulesApproved": false
+  },
+  "form": { "endpoint": null },
+  "tour": { "wording": "home-services" },
+  "services": [
+    {
+      "id": "window-cleaning",
+      "name": "Window Cleaning",
+      "keyword": "window cleaning",
+      "source": "guess",
+      "summary": null,
+      "what": "Window cleaning covers the glass inside and out, plus the frames, sills and tracks around it. Screens are brushed and rinsed while the glass is being cleaned.\n\nMost homes book a full inside-and-outside clean. Outside-only cleans suit homes where the inside glass is easy to reach.",
+      "why": "Clean glass lets in more light and makes the whole room look finished. Regular cleaning also stops hard water spots, sprinkler overspray and salt film from building up to the point where they need special treatment.",
+      "how": "Send the form with your address and the rough number of windows. You get a quote, pick a time, and the crew cleans the glass, frames, sills and screens. Someone checks every window before leaving.",
+      "pricing": null,
+      "faq": [
+        { "q": "How often should windows be cleaned?", "a": "Most homes book two or three cleans a year. Homes near the coast, near sprinklers or under trees often need it more often." },
+        { "q": "Do I need to be home for window cleaning?", "a": "Only for inside windows. Outside-only cleans can be done while you are out, as long as the crew can reach the side yards." }
+      ],
+      "related": ["screen-repair", "hard-water-stain-removal"]
+    },
+    {
+      "id": "screen-repair",
+      "name": "Screen Repair",
+      "keyword": "window screen repair",
+      "source": "guess",
+      "summary": null, "what": null, "why": null, "how": null, "pricing": null,
+      "faq": [],
+      "related": ["window-cleaning"]
+    },
+    {
+      "id": "gutter-cleaning",
+      "name": "Gutter Cleaning",
+      "keyword": "gutter cleaning",
+      "source": "guess",
+      "summary": null, "what": null, "why": null, "how": null, "pricing": null,
+      "faq": [],
+      "related": ["pressure-washing"]
+    },
+    {
+      "id": "solar-panel-cleaning",
+      "name": "Solar Panel Cleaning",
+      "keyword": "solar panel cleaning",
+      "source": "guess",
+      "summary": null, "what": null, "why": null, "how": null, "pricing": null,
+      "faq": [],
+      "related": []
+    },
+    {
+      "id": "pressure-washing",
+      "name": "Pressure Washing",
+      "keyword": "pressure washing",
+      "source": "guess",
+      "summary": null, "what": null, "why": null, "how": null, "pricing": null,
+      "faq": [],
+      "related": ["gutter-cleaning"]
+    },
+    {
+      "id": "hard-water-stain-removal",
+      "name": "Hard Water Stain Removal",
+      "keyword": "hard water stain removal",
+      "source": "guess",
+      "summary": null, "what": null, "why": null, "how": null, "pricing": null,
+      "faq": [],
+      "related": ["window-cleaning"]
+    }
+  ],
+  "locations": [
+    { "id": "irvine", "name": "Irvine", "region": "CA", "lat": 33.6846, "lng": -117.8265, "source": "guess", "services": "all", "summary": null, "notes": null, "faq": [] },
+    { "id": "tustin", "name": "Tustin", "region": "CA", "lat": 33.7458, "lng": -117.8262, "source": "guess", "services": "all", "summary": null, "notes": null, "faq": [] },
+    { "id": "costa-mesa", "name": "Costa Mesa", "region": "CA", "lat": 33.6411, "lng": -117.9187, "source": "guess", "services": "all", "summary": null, "notes": null, "faq": [] },
+    { "id": "newport-beach", "name": "Newport Beach", "region": "CA", "lat": 33.6189, "lng": -117.9298, "source": "guess", "services": "all", "summary": null, "notes": null, "faq": [] },
+    { "id": "lake-forest", "name": "Lake Forest", "region": "CA", "lat": 33.6469, "lng": -117.6892, "source": "guess", "services": ["window-cleaning", "screen-repair", "gutter-cleaning", "pressure-washing"], "summary": null, "notes": null, "faq": [] },
+    { "id": "mission-viejo", "name": "Mission Viejo", "region": "CA", "lat": 33.6000, "lng": -117.6720, "source": "guess", "services": ["window-cleaning", "screen-repair", "gutter-cleaning"], "summary": null, "notes": null, "faq": [] }
+  ],
+  "combos": [
+    {
+      "service": "window-cleaning",
+      "location": "newport-beach",
+      "notes": "Homes close to the water collect a salt film on the glass that ordinary cleaning leaves streaky. Coastal homes usually need cleaning more often than inland ones.",
+      "faq": [
+        { "q": "How often should coastal homes in Newport Beach have their windows cleaned?", "a": null }
+      ]
+    }
+  ]
+}

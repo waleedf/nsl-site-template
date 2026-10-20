@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.astro/
+.deploy/
+.wrangler/
+verification/
+tour/
+.DS_Store
+.env
+.env.*

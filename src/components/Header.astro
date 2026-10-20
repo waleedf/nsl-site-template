@@ -1,0 +1,37 @@
+---
+import { getBusiness, makeHref, paths } from '../lib/site.mjs';
+import { locationHeader } from '../lib/copy.mjs';
+const b = getBusiness();
+const href = makeHref(import.meta.env.BASE_URL);
+---
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand-name" href={href(paths.home())}>{b.name}</a>
+    <nav class="nav" aria-label="Main">
+      <details>
+        <summary>Services</summary>
+        <div class="menu">
+          {b.services.map((s) => <a href={href(paths.service(s))}>{s.name}</a>)}
+          <a href={href(paths.services())}>All services</a>
+        </div>
+      </details>
+      <details>
+        <summary>Areas</summary>
+        <div class="menu">
+          {b.locations.map((l) => <a href={href(paths.location(l))}>{locationHeader(b, l)}</a>)}
+          <a href={href(paths.areas())}>All service areas</a>
+        </div>
+      </details>
+      <a href={href(paths.guides())}>Guides</a>
+    </nav>
+    {b.phone && <a class="header-phone" href={`tel:${b.phone.replace(/[^\d+]/g, '')}`}>{b.phone}</a>}
+    <a class="btn" data-cta="header" href={href(paths.contact())}>Get a quote</a>
+  </div>
+  <script>
+    // Close an open menu when another opens or on an outside click / Escape.
+    const menus = [...document.querySelectorAll<HTMLDetailsElement>('.nav details')];
+    menus.forEach((d) => d.addEventListener('toggle', () => { if (d.open) menus.forEach((o) => o !== d && (o.open = false)); }));
+    document.addEventListener('click', (e) => menus.forEach((d) => { if (!d.contains(e.target as Node)) d.open = false; }));
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') menus.forEach((d) => (d.open = false)); });
+  </script>
+</header>

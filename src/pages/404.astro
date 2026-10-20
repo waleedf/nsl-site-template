@@ -1,0 +1,14 @@
+---
+import Base from '../layouts/Base.astro';
+import { getBusiness, makeHref, paths } from '../lib/site.mjs';
+const b = getBusiness();
+const href = makeHref(import.meta.env.BASE_URL);
+---
+<Base title={`Page not found | ${b.name}`} description={`This page doesn't exist on the ${b.name} website.`} pageType="404">
+  <section class="hero">
+    <div class="wrap">
+      <h1>That page doesn't exist</h1>
+      <p class="lead">Try the <a href={href(paths.services())}>{b.trade.toLowerCase()} services list</a> or <a href={href(paths.contact())}>request a quote</a>.</p>
+    </div>
+  </section>
+</Base>

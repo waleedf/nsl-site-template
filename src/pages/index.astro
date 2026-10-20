@@ -1,0 +1,68 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import InquiryForm from '../components/InquiryForm.astro';
+import SecondaryCapture from '../components/SecondaryCapture.astro';
+import Copy from '../components/Copy.astro';
+import { getBusiness, makeHref, paths } from '../lib/site.mjs';
+import { homeHeader, homeSummary, locationHeader, serviceSummary, title } from '../lib/copy.mjs';
+import { businessLd } from '../lib/ld.mjs';
+
+const b = getBusiness();
+const href = makeHref(import.meta.env.BASE_URL);
+const header = homeHeader(b);
+const guides = (await getCollection('guides')).sort((x, y) => +y.data.updated - +x.data.updated).slice(0, 3);
+---
+<Base title={title(header, b)} description={homeSummary(b)} pageType="home" jsonLd={[businessLd(b, new URL(href(), Astro.site).href)]}>
+  <Hero header={header} summary={homeSummary(b)} cta="Get a quote">
+    <InquiryForm compact heading="Get a free quote" />
+  </Hero>
+
+  <section class="section" id="services" data-section="services">
+    <div class="wrap">
+      <h2>{b.trade} services</h2>
+      <div class="grid">
+        {b.services.map((s) => (
+          <a class="tile" href={href(paths.service(s))}><strong>{s.name}</strong><span>{s.summary ?? serviceSummary(b, s).split('. ')[0] + '.'}</span></a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {b.reviews && (
+    <section class="section" id="reviews" data-section="reviews">
+      <div class="wrap">
+        <div class="card">
+          <h2>Rated {b.reviews.rating} out of 5 from {b.reviews.count} {b.reviews.source} reviews</h2>
+          {b.reviews.url && <p><a href={b.reviews.url} rel="noopener">Read {b.name}'s {b.reviews.source} reviews</a></p>}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="section" data-section="why-us">
+    <div class="wrap">
+      <h2>Why {b.name}?</h2>
+      {b.proof.length ? <ul class="proof">{b.proof.map((p) => <li>{p}</li>)}</ul> : <Copy text={null} />}
+    </div>
+  </section>
+
+  <section class="section" data-section="areas">
+    <div class="wrap">
+      <h2>Areas we serve in {b.market}</h2>
+      <ul class="links">{b.locations.map((l) => <li><a href={href(paths.location(l))}>{locationHeader(b, l)}</a></li>)}</ul>
+    </div>
+  </section>
+
+  <section class="section" data-section="guides">
+    <div class="wrap">
+      <h2>{b.trade} guides</h2>
+      <div class="grid">
+        {guides.map((g) => <a class="tile" href={href(paths.guide(g.id))}><strong>{g.data.title}</strong><span>{g.data.description}</span></a>)}
+      </div>
+    </div>
+  </section>
+
+  <SecondaryCapture />
+</Base>

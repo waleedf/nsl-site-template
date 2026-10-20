@@ -1,0 +1,19 @@
+---
+// Answer-shaped FAQ: each question is a heading and the answer starts right
+// under it, which is the passage AI answers lift. The FAQPage markup is built
+// from the same list, so what search engines read always matches the page.
+import Copy from './Copy.astro';
+interface Props { heading: string; items: { q: string; a?: string | null }[] }
+const { heading, items } = Astro.props;
+---
+<section class="section" data-section="faq" id="faq">
+  <div class="wrap">
+    <h2>{heading}</h2>
+    {items.map((f) => (
+      <div class="faq-item" data-faq>
+        <h3 data-faq-q>{f.q}</h3>
+        <Copy text={f.a} />
+      </div>
+    ))}
+  </div>
+</section>

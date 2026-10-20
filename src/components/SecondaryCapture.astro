@@ -1,0 +1,33 @@
+---
+// The second, quieter conversion: newsletter or a giveaway entry, picked per
+// site in business.json "secondary". Never tied to leaving a review.
+import { getBusiness, makeHref, paths } from '../lib/site.mjs';
+const b = getBusiness();
+const href = makeHref(import.meta.env.BASE_URL);
+const endpoint = b.form.endpoint ?? href('api/lead');
+const s = b.secondary;
+const ends = s.kind === 'giveaway' ? new Date(`${s.endsOn}T12:00:00Z`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' }) : '';
+const headline = s.kind === 'giveaway' ? `Enter to win ${s.prize}` : s.headline ?? `Get ${b.trade.toLowerCase()} tips and offers by email`;
+const pitch = s.kind === 'giveaway' ? `One entry per email. Drawing after ${ends}.` : s.pitch ?? 'A short email now and then. Unsubscribe any time.';
+---
+<section class="section" data-section="secondary">
+  <div class="wrap">
+    <div class="secondary">
+      <h2>{headline}</h2>
+      <p>{pitch}</p>
+      <form class="form" data-form="secondary" data-cta="secondary" action={endpoint} method="post" novalidate>
+        <input type="hidden" name="kind" value={s.kind} />
+        <label>Email <input name="email" type="email" autocomplete="email" required /></label>
+        <button class="btn quiet" type="submit">{s.kind === 'giveaway' ? 'Enter' : 'Sign up'}</button>
+        <label class="check"><input type="checkbox" name="consent" value="yes" required /> {s.kind === 'giveaway' ? `Email me about this giveaway and offers from ${b.name}.` : `Email me tips and offers from ${b.name}.`}</label>
+        <label class="hp" aria-hidden="true">Leave this empty <input name="website" tabindex="-1" autocomplete="off" /></label>
+        <p class="status" role="status" aria-live="polite"></p>
+        {s.kind === 'giveaway' && <p class="fine">No purchase necessary. <a href={href(paths.rules())}>Official rules</a>.</p>}
+      </form>
+    </div>
+  </div>
+</section>
+<script>
+  import { wireForms } from '../scripts/forms';
+  wireForms();
+</script>

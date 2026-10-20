@@ -1,0 +1,30 @@
+---
+import Base from '../../layouts/Base.astro';
+import Hero from '../../components/Hero.astro';
+import SecondaryCapture from '../../components/SecondaryCapture.astro';
+import { getBusiness, makeHref, paths, servicesAt } from '../../lib/site.mjs';
+import { locationHeader, title } from '../../lib/copy.mjs';
+
+const b = getBusiness();
+const href = makeHref(import.meta.env.BASE_URL);
+const header = `${b.trade} service areas in ${b.market}`;
+---
+<Base
+  title={title(header, b)}
+  description={`Towns ${b.name} serves across ${b.market}.`}
+  pageType="index"
+  crumbs={[{ name: 'Home', href: href() }, { name: 'Areas', href: href(paths.areas()) }]}
+>
+  <Hero header={header} summary={`Pick your town to see the services offered there.`} cta="Get a quote" ctaHref={href(paths.contact())} />
+  <section class="section" data-section="areas">
+    <div class="wrap grid">
+      {b.locations.map((l) => (
+        <a class="tile" href={href(paths.location(l))}>
+          <strong>{locationHeader(b, l)}</strong>
+          <span>{servicesAt(b, l).map((s) => s.name).join(' · ')}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+  <SecondaryCapture />
+</Base>

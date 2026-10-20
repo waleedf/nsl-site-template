@@ -1,0 +1,9 @@
+---
+// Renders real copy, or a marked placeholder when business.json has none yet.
+// verify.mjs counts [data-placeholder]; production builds fail while any remain.
+import { LOREM } from '../lib/copy.mjs';
+interface Props { text?: string | null }
+const { text } = Astro.props;
+const paragraphs = text ? text.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean) : [];
+---
+{paragraphs.length ? paragraphs.map((p) => <p>{p}</p>) : <p data-placeholder>{LOREM}</p>}

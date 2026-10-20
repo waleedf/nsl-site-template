@@ -1,0 +1,15 @@
+---
+// A titled list of internal links. Link text always names the page it opens
+// ("Window Cleaning in Irvine"), never "learn more".
+interface Props { heading: string; links: { href: string; label: string }[]; section?: string; intro?: string }
+const { heading, links, section, intro } = Astro.props;
+---
+{links.length > 0 && (
+  <section class="section" data-section={section}>
+    <div class="wrap">
+      <h2>{heading}</h2>
+      {intro && <p>{intro}</p>}
+      <ul class="links">{links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul>
+    </div>
+  </section>
+)}

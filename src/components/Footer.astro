@@ -1,0 +1,43 @@
+---
+import { getCollection } from 'astro:content';
+import { getBusiness, makeHref, paths } from '../lib/site.mjs';
+const b = getBusiness();
+const href = makeHref(import.meta.env.BASE_URL);
+const guides = (await getCollection('guides')).sort((x, y) => +y.data.updated - +x.data.updated).slice(0, 5);
+// Sitewide lists stay short: past 20 towns the footer points at the areas page.
+const towns = b.locations.slice(0, 20);
+---
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <h2>Services</h2>
+        <ul>{b.services.map((s) => <li><a href={href(paths.service(s))}>{s.name}</a></li>)}</ul>
+      </div>
+      <div>
+        <h2>Areas we serve</h2>
+        <ul>
+          {towns.map((l) => <li><a href={href(paths.location(l))}>{l.name}</a></li>)}
+          {b.locations.length > towns.length && <li><a href={href(paths.areas())}>All {b.locations.length} service areas</a></li>}
+        </ul>
+      </div>
+      <div>
+        <h2>Guides</h2>
+        <ul>
+          {guides.map((g) => <li><a href={href(paths.guide(g.id))}>{g.data.title}</a></li>)}
+          <li><a href={href(paths.guides())}>All guides</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>{b.name}</h2>
+        <ul>
+          <li><a href={href(paths.contact())}>Get a quote</a></li>
+          {b.phone && <li><a href={`tel:${b.phone.replace(/[^\d+]/g, '')}`}>{b.phone}</a></li>}
+          {b.email && <li><a href={`mailto:${b.email}`}>{b.email}</a></li>}
+          {b.secondary.kind === 'giveaway' && <li><a href={href(paths.rules())}>Giveaway official rules</a></li>}
+        </ul>
+      </div>
+    </div>
+    <p class="footer-base">© {new Date().getFullYear()} {b.name}. Website by <a href="https://northshorelabs.dev">North Shore Labs</a>.</p>
+  </div>
+</footer>

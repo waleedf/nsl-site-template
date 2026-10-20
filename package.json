@@ -1,0 +1,34 @@
+{
+  "name": "nsl-site-template",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "North Shore Labs Close the Gap site template: service, location and service-in-location pages, guides and internal linking from one business file.",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "build:preview": "SITE_MODE=preview astro build",
+    "build:production": "SITE_MODE=production astro build",
+    "preview": "astro preview",
+    "verify": "node scripts/verify.mjs",
+    "check": "npm run build:preview && npm run verify",
+    "check:production": "npm run build:production && node scripts/verify.mjs --production",
+    "test": "node --test \"tests/*.test.mjs\"",
+    "tour": "node scripts/tour.mjs",
+    "deploy:try": "node scripts/deploy-try.mjs",
+    "new": "node scripts/new-site.mjs"
+  },
+  "dependencies": {
+    "@astrojs/markdown-satteri": "^0.4.4",
+    "@astrojs/sitemap": "^3.7.0",
+    "astro": "^7.2.4",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "node-html-parser": "^7.0.1",
+    "wrangler": "4.135.0"
+  }
+}

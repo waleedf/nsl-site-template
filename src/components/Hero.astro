@@ -1,0 +1,23 @@
+---
+// Opening of every landing page: the buyer's search said back as the header,
+// a one-line answer, and the primary action. The form sits beside it on wide
+// screens when `form` is passed in the slot.
+import { getBusiness } from '../lib/site.mjs';
+interface Props { header: string; summary: string; cta: string; ctaHref?: string }
+const { header, summary, cta, ctaHref = '#inquiry' } = Astro.props;
+const b = getBusiness();
+const hasAside = Astro.slots.has('default');
+---
+<section class="hero">
+  <div class={`wrap ${hasAside ? 'hero-grid' : ''}`}>
+    <div>
+      <h1>{header}</h1>
+      <p class="lead">{summary}</p>
+      <div class="actions">
+        <a class="btn" data-cta="primary" href={ctaHref}>{cta}</a>
+        {b.phone && <a class="btn quiet" href={`tel:${b.phone.replace(/[^\d+]/g, '')}`}>Call {b.phone}</a>}
+      </div>
+    </div>
+    {hasAside && <div><slot /></div>}
+  </div>
+</section>

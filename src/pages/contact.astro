@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+import InquiryForm from '../components/InquiryForm.astro';
+import SecondaryCapture from '../components/SecondaryCapture.astro';
+import { getBusiness, makeHref, paths } from '../lib/site.mjs';
+import { title } from '../lib/copy.mjs';
+
+const b = getBusiness();
+const href = makeHref(import.meta.env.BASE_URL);
+const header = `Get a quote from ${b.name}`;
+---
+<Base
+  title={title(header, b)}
+  description={`Request a ${b.trade.toLowerCase()} quote from ${b.name}${b.phone ? ` or call ${b.phone}` : ''}.`}
+  pageType="contact"
+  crumbs={[{ name: 'Home', href: href() }, { name: 'Get a quote', href: href(paths.contact()) }]}
+>
+  <section class="hero">
+    <div class="wrap">
+      <h1>{header}</h1>
+      <p class="lead">Tell us what you need and where. {b.phone ? `Or call ${b.phone}.` : ''}</p>
+    </div>
+  </section>
+  <InquiryForm heading="Your request" />
+  <SecondaryCapture />
+</Base>

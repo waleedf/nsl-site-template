@@ -1,0 +1,49 @@
+---
+// Official rules, built only when the secondary conversion is a giveaway.
+// California requires "no purchase necessary" and published rules. This text
+// is a starting draft: set secondary.rulesApproved once Waleed (or counsel)
+// has approved it; `verify --production` fails until then.
+import Base from '../layouts/Base.astro';
+import { getBusiness, makeHref, paths } from '../lib/site.mjs';
+import { title } from '../lib/copy.mjs';
+
+export function getStaticPaths() {
+  return getBusiness().secondary.kind === 'giveaway' ? [{ params: { legal: 'giveaway-rules' } }] : [];
+}
+
+const b = getBusiness();
+const s = b.secondary as { kind: 'giveaway'; prize: string; endsOn: string; sponsor?: string; rulesApproved: boolean };
+const href = makeHref(import.meta.env.BASE_URL);
+const sponsor = s.sponsor ?? b.name;
+const ends = new Date(`${s.endsOn}T12:00:00Z`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+const header = `${b.name} giveaway: official rules`;
+---
+<Base
+  title={title(header, b)}
+  description={`Official rules for the ${b.name} giveaway for ${s.prize}.`}
+  pageType="legal"
+  crumbs={[{ name: 'Home', href: href() }, { name: 'Giveaway rules', href: href(paths.rules()) }]}
+>
+  <section class="section">
+    <div class="wrap article">
+      <h1>{header}</h1>
+      {!s.rulesApproved && <p data-placeholder>Draft rules. Not yet approved for publication.</p>}
+      <h2>No purchase necessary</h2>
+      <p>No purchase or payment of any kind is necessary to enter or win. A purchase does not increase your chances of winning.</p>
+      <h2>Sponsor</h2>
+      <p>{sponsor}{b.phone ? `, ${b.phone}` : ''}.</p>
+      <h2>Eligibility</h2>
+      <p>Open to legal residents of the United States who are 18 or older. Employees of the sponsor and their households are not eligible. Void where prohibited.</p>
+      <h2>How to enter</h2>
+      <p>Enter your email address in the giveaway form on this website and confirm you agree to receive email. Limit one entry per person and per email address.</p>
+      <h2>Entry period</h2>
+      <p>Entries are accepted until 11:59 p.m. Pacific Time on {ends}.</p>
+      <h2>Prize</h2>
+      <p>One winner receives {s.prize}. The prize has no cash value, is not transferable, and cannot be combined with other offers unless the sponsor agrees.</p>
+      <h2>Winner selection and notice</h2>
+      <p>One winner is drawn at random from all eligible entries within 14 days after the entry period ends. The winner is notified by email and must reply within 14 days, or an alternate winner may be drawn. Odds depend on the number of eligible entries.</p>
+      <h2>Privacy</h2>
+      <p>Entry email addresses are used to run this giveaway and to send the email you agreed to receive. You can unsubscribe at any time.</p>
+    </div>
+  </section>
+</Base>

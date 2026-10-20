@@ -1,0 +1,71 @@
+---
+// Location page: "do they serve me, here?" Header, answer, action, the map,
+// every service offered here (each linking to its service-in-town page),
+// what's true about working in this place, and nearby towns.
+import { getCollection } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import Hero from '../../../components/Hero.astro';
+import Copy from '../../../components/Copy.astro';
+import AreaMap from '../../../components/AreaMap.astro';
+import Faq from '../../../components/Faq.astro';
+import LinkSection from '../../../components/LinkSection.astro';
+import InquiryForm from '../../../components/InquiryForm.astro';
+import SecondaryCapture from '../../../components/SecondaryCapture.astro';
+import { combosOf, getBusiness, makeHref, nearby, paths, servicesAt } from '../../../lib/site.mjs';
+import { comboHeader, locationDescription, locationHeader, locationSummary, title } from '../../../lib/copy.mjs';
+import { faqLd } from '../../../lib/ld.mjs';
+
+export function getStaticPaths() {
+  return getBusiness().locations.map((l) => ({ params: { location: l.id }, props: { id: l.id } }));
+}
+
+const b = getBusiness();
+const l = b.locations.find((x) => x.id === Astro.props.id)!;
+const href = makeHref(import.meta.env.BASE_URL);
+const header = locationHeader(b, l);
+const offered = servicesAt(b, l);
+const combos = combosOf(b).filter((c) => c.location.id === l.id);
+const guides = (await getCollection('guides')).filter((g) => g.data.location === l.id);
+---
+<Base
+  title={title(header, b)}
+  description={locationDescription(b, l, offered)}
+  pageType="location"
+  crumbs={[{ name: 'Home', href: href() }, { name: 'Areas', href: href(paths.areas()) }, { name: l.name, href: href(paths.location(l)) }]}
+  jsonLd={l.faq.length ? [faqLd(l.faq)] : []}
+>
+  <Hero header={header} summary={locationSummary(b, l, offered)} cta={`Get a quote in ${l.name}`} />
+
+  <section class="section" data-section="map">
+    <div class="wrap two-col">
+      <div>
+        <h2>{b.name} in {l.name}</h2>
+        <Copy text={l.notes} />
+      </div>
+      <AreaMap name={l.name} region={l.region} lat={l.lat} lng={l.lng} business={b.name} />
+    </div>
+  </section>
+
+  <LinkSection
+    heading={`Services in ${l.name}`}
+    section="services"
+    links={combos.map((c) => ({ href: href(paths.combo(c.service, l)), label: comboHeader(b, c.service, l, c.override) }))}
+  />
+
+  {l.faq.length > 0 && <Faq heading={`${b.trade} questions in ${l.name}`} items={l.faq} />}
+
+  <LinkSection
+    heading={`${l.name} guides`}
+    section="guides"
+    links={guides.map((g) => ({ href: href(paths.guide(g.id)), label: g.data.title }))}
+  />
+
+  <LinkSection
+    heading="Nearby areas"
+    section="nearby"
+    links={nearby(b, l).map((n) => ({ href: href(paths.location(n)), label: locationHeader(b, n) }))}
+  />
+
+  <InquiryForm location={l.id} heading={`Get a quote in ${l.name}`} />
+  <SecondaryCapture />
+</Base>

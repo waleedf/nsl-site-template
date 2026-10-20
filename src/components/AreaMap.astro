@@ -1,0 +1,15 @@
+---
+// Required on every location and service-in-location page. Shows the town,
+// never a home address (service-area businesses often run from home).
+// OpenStreetMap's embed needs no API key; the iframe loads lazily.
+interface Props { name: string; region: string; lat: number; lng: number; business: string }
+const { name, region, lat, lng, business } = Astro.props;
+const dLat = 0.05, dLng = 0.07;
+const bbox = [lng - dLng, lat - dLat, lng + dLng, lat + dLat].map((n) => n.toFixed(4)).join(',');
+const src = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`;
+const google = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name}, ${region}`)}`;
+---
+<figure class="map" data-map>
+  <iframe src={src} title={`Map of ${name}, ${region}`} loading="lazy" referrerpolicy="no-referrer"></iframe>
+  <figcaption>{business} serves {name} and nearby neighborhoods. <a href={google} rel="noopener">Open {name} in Google Maps</a></figcaption>
+</figure>

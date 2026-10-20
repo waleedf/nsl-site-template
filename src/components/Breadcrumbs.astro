@@ -1,0 +1,10 @@
+---
+interface Props { crumbs: { name: string; href: string }[] }
+const { crumbs } = Astro.props;
+const last = crumbs.length - 1;
+---
+<nav class="crumbs wrap" aria-label="Breadcrumb">
+  <ol>
+    {crumbs.map((c, i) => <li>{i === last ? <span aria-current="page">{c.name}</span> : <a href={c.href}>{c.name}</a>}</li>)}
+  </ol>
+</nav>

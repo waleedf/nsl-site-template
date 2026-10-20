@@ -1,0 +1,92 @@
+---
+// Service-in-town page: the long-tail search ("window cleaning in irvine")
+// said back plainly. Map, what's included, local notes, how it works and
+// costs, FAQ with the town in it, and links up to the service and town pages.
+import { getCollection } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import Hero from '../../../components/Hero.astro';
+import Copy from '../../../components/Copy.astro';
+import AreaMap from '../../../components/AreaMap.astro';
+import Faq from '../../../components/Faq.astro';
+import LinkSection from '../../../components/LinkSection.astro';
+import InquiryForm from '../../../components/InquiryForm.astro';
+import SecondaryCapture from '../../../components/SecondaryCapture.astro';
+import { combosOf, getBusiness, makeHref, paths, sameServiceNearby } from '../../../lib/site.mjs';
+import { comboDescription, comboHeader, comboSummary, faqFor, locationHeader, serviceHeader, title } from '../../../lib/copy.mjs';
+import { faqLd, serviceLd } from '../../../lib/ld.mjs';
+
+export function getStaticPaths() {
+  return combosOf(getBusiness()).map((c) => ({
+    params: { location: c.location.id, service: c.service.id },
+    props: { sid: c.service.id, lid: c.location.id },
+  }));
+}
+
+const b = getBusiness();
+const combo = combosOf(b).find((c) => c.service.id === Astro.props.sid && c.location.id === Astro.props.lid)!;
+const { service: s, location: l, override: o } = combo;
+const href = makeHref(import.meta.env.BASE_URL);
+const header = comboHeader(b, s, l, o);
+const faq = faqFor(b, s, l, o?.faq ?? []);
+const siblings = combosOf(b).filter((c) => c.location.id === l.id && c.service.id !== s.id);
+const guides = (await getCollection('guides')).filter((g) => g.data.about.includes(s.id) && (!g.data.location || g.data.location === l.id));
+const url = new URL(href(paths.combo(s, l)), Astro.site).href;
+---
+<Base
+  title={title(header, b)}
+  description={comboDescription(b, s, l)}
+  pageType="combo"
+  crumbs={[
+    { name: 'Home', href: href() },
+    { name: 'Areas', href: href(paths.areas()) },
+    { name: l.name, href: href(paths.location(l)) },
+    { name: s.name, href: href(paths.combo(s, l)) },
+  ]}
+  jsonLd={[serviceLd(b, s, [`${l.name}, ${l.region}`], url), faqLd(faq)]}
+>
+  <Hero header={header} summary={comboSummary(b, s, l, o)} cta={`Get a ${s.keyword} quote in ${l.name}`} />
+
+  <section class="section" data-section="what">
+    <div class="wrap two-col">
+      <div>
+        <h2>What {s.keyword} in {l.name} includes</h2>
+        <Copy text={o?.what ?? s.what} />
+      </div>
+      <AreaMap name={l.name} region={l.region} lat={l.lat} lng={l.lng} business={b.name} />
+    </div>
+  </section>
+
+  <section class="section" data-section="local">
+    <div class="wrap two-col">
+      <div><h2>{s.name} for {l.name} homes</h2><Copy text={o?.notes ?? l.notes} /></div>
+      <div><h2>How it works and what it costs</h2><Copy text={s.how} />{s.pricing && <p>{s.pricing}</p>}</div>
+    </div>
+  </section>
+
+  <Faq heading={`${s.name} in ${l.name}: questions`} items={faq} />
+
+  <LinkSection
+    heading={`More about ${s.keyword}`}
+    section="parents"
+    links={[
+      { href: href(paths.service(s)), label: serviceHeader(b, s) },
+      { href: href(paths.location(l)), label: locationHeader(b, l) },
+      ...guides.map((g) => ({ href: href(paths.guide(g.id)), label: g.data.title })),
+    ]}
+  />
+
+  <LinkSection
+    heading={`Other services in ${l.name}`}
+    section="siblings"
+    links={siblings.map((c) => ({ href: href(paths.combo(c.service, l)), label: comboHeader(b, c.service, l, c.override) }))}
+  />
+
+  <LinkSection
+    heading={`${s.name} nearby`}
+    section="nearby"
+    links={sameServiceNearby(b, s, l).map((n) => ({ href: href(paths.combo(s, n)), label: comboHeader(b, s, n, b.combos.find((c) => c.service === s.id && c.location === n.id)) }))}
+  />
+
+  <InquiryForm service={s.id} location={l.id} heading={`Get a ${s.keyword} quote in ${l.name}`} />
+  <SecondaryCapture />
+</Base>

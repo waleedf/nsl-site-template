@@ -1,0 +1,49 @@
+---
+// The primary conversion. Every service, location and combo page carries it at
+// #inquiry with the page's service/location preselected; guides and indexes
+// link to /contact/. Status messages only ever say what actually happened.
+import { getBusiness, makeHref } from '../lib/site.mjs';
+interface Props { service?: string; location?: string; heading?: string; compact?: boolean }
+const { service, location, heading = 'Get a quote', compact = false } = Astro.props;
+const b = getBusiness();
+const href = makeHref(import.meta.env.BASE_URL);
+const endpoint = b.form.endpoint ?? href('api/lead');
+---
+<section id="inquiry" class={compact ? '' : 'section'}>
+  <div class={compact ? '' : 'wrap'}>
+    <div class="card">
+      <h2>{heading}</h2>
+      <form class="form" data-form="inquiry" data-phone={b.phone ?? ''} action={endpoint} method="post" novalidate>
+        <input type="hidden" name="kind" value="inquiry" />
+        <div class="row">
+          <label>Name <input name="name" autocomplete="name" required /></label>
+          <label>Phone <input name="phone" type="tel" autocomplete="tel" inputmode="tel" required /></label>
+        </div>
+        <label>Email (optional) <input name="email" type="email" autocomplete="email" /></label>
+        <div class="row">
+          <label>Service
+            <select name="service">
+              {b.services.map((s) => <option value={s.id} selected={s.id === service}>{s.name}</option>)}
+              <option value="other">Something else</option>
+            </select>
+          </label>
+          <label>City
+            <select name="location">
+              {b.locations.map((l) => <option value={l.id} selected={l.id === location}>{l.name}</option>)}
+              <option value="other" selected={!location}>Somewhere else</option>
+            </select>
+          </label>
+        </div>
+        <label>What do you need? <textarea name="message" required></textarea></label>
+        <label class="hp" aria-hidden="true">Leave this empty <input name="website" tabindex="-1" autocomplete="off" /></label>
+        <button class="btn" type="submit">Send my request</button>
+        <p class="status" role="status" aria-live="polite"></p>
+        <p class="fine">We only use your details to reply to this request.{b.phone && ` Prefer to talk? Call ${b.phone}.`}</p>
+      </form>
+    </div>
+  </div>
+</section>
+<script>
+  import { wireForms } from '../scripts/forms';
+  wireForms();
+</script>

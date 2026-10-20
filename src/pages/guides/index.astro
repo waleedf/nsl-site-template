@@ -1,0 +1,33 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Hero from '../../components/Hero.astro';
+import SecondaryCapture from '../../components/SecondaryCapture.astro';
+import { getBusiness, makeHref, paths } from '../../lib/site.mjs';
+import { title } from '../../lib/copy.mjs';
+
+const b = getBusiness();
+const href = makeHref(import.meta.env.BASE_URL);
+const header = `${b.trade} guides`;
+const guides = (await getCollection('guides')).sort((x, y) => +y.data.updated - +x.data.updated);
+const label = { comparison: 'Comparison', list: 'List', 'how-to': 'How-to' };
+---
+<Base
+  title={title(header, b)}
+  description={`Comparisons, lists and how-tos from ${b.name}.`}
+  pageType="index"
+  crumbs={[{ name: 'Home', href: href() }, { name: 'Guides', href: href(paths.guides()) }]}
+>
+  <Hero header={header} summary="Straight answers before you book." cta="Get a quote" ctaHref={href(paths.contact())} />
+  <section class="section" data-section="guides">
+    <div class="wrap grid">
+      {guides.map((g) => (
+        <a class="tile" href={href(paths.guide(g.id))}>
+          <strong>{g.data.title}</strong>
+          <span>{label[g.data.type]} · {g.data.description}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+  <SecondaryCapture />
+</Base>

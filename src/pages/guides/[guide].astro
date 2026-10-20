@@ -1,0 +1,67 @@
+---
+// A publication: comparison, list or how-to. The body must link to at least
+// one service page in its own words; the page adds related services, sources
+// and the primary action carrying the service into the contact form.
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import LinkSection from '../../components/LinkSection.astro';
+import SecondaryCapture from '../../components/SecondaryCapture.astro';
+import { combosOf, getBusiness, makeHref, paths } from '../../lib/site.mjs';
+import { comboHeader, serviceHeader, title } from '../../lib/copy.mjs';
+import { articleLd } from '../../lib/ld.mjs';
+
+export async function getStaticPaths() {
+  const b = getBusiness();
+  const ids = new Set(b.services.map((s) => s.id));
+  const locs = new Set(b.locations.map((l) => l.id));
+  return (await getCollection('guides')).map((g) => {
+    const unknown = g.data.about.filter((id) => !ids.has(id));
+    if (unknown.length) throw new Error(`site/guides/${g.id}.md: "about" names unknown service(s) ${unknown.join(', ')}`);
+    if (g.data.location && !locs.has(g.data.location)) throw new Error(`site/guides/${g.id}.md: unknown location "${g.data.location}"`);
+    return { params: { guide: g.id }, props: { guide: g } };
+  });
+}
+
+const b = getBusiness();
+const { guide } = Astro.props;
+const { Content } = await render(guide);
+const href = makeHref(import.meta.env.BASE_URL);
+const g = guide.data;
+const about = g.about.map((id) => b.services.find((s) => s.id === id)!);
+const loc = g.location ? b.locations.find((l) => l.id === g.location) : null;
+const related = about.map((s) => {
+  const combo = loc && combosOf(b).find((c) => c.service.id === s.id && c.location.id === loc.id);
+  return combo ? { href: href(paths.combo(s, loc)), label: comboHeader(b, s, loc, combo.override) } : { href: href(paths.service(s)), label: serviceHeader(b, s) };
+});
+const contact = `${href(paths.contact())}?service=${about[0].id}${loc ? `&location=${loc.id}` : ''}`;
+const updated = g.updated.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+const url = new URL(href(paths.guide(guide.id)), Astro.site).href;
+---
+<Base
+  title={title(g.title, b)}
+  description={g.description}
+  pageType="guide"
+  guideType={g.type}
+  crumbs={[{ name: 'Home', href: href() }, { name: 'Guides', href: href(paths.guides()) }, { name: g.title, href: href(paths.guide(guide.id)) }]}
+  jsonLd={[articleLd(b, g, url)]}
+>
+  <article class="section">
+    <div class="wrap article">
+      <h1>{g.title}</h1>
+      <p class="meta">Updated <time datetime={g.updated.toISOString().slice(0, 10)}>{updated}</time> · {b.name}</p>
+      <div data-section="body"><Content /></div>
+      {g.sources.length > 0 && (
+        <section data-section="sources">
+          <h2>Sources</h2>
+          <ul>{g.sources.map((s) => <li>{s.url ? <a href={s.url} rel="noopener">{s.label}</a> : s.label}</li>)}</ul>
+        </section>
+      )}
+      <div class="card" style="margin-top:32px">
+        <h2>Ready to book {about[0].keyword}?</h2>
+        <div class="actions"><a class="btn" data-cta="primary" href={contact}>Get a {about[0].keyword} quote</a></div>
+      </div>
+    </div>
+  </article>
+  <LinkSection heading="Related services" section="related" links={related} />
+  <SecondaryCapture />
+</Base>
